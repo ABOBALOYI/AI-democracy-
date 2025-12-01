@@ -4,13 +4,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
 
 from . import storage
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+from .config import COUNCIL_MODELS, DEFAULT_CHAIRMAN_MODEL
 
 app = FastAPI(title="LLM Council API")
 
@@ -32,6 +33,7 @@ class CreateConversationRequest(BaseModel):
 class SendMessageRequest(BaseModel):
     """Request to send a message in a conversation."""
     content: str
+    chairman_model: Optional[str] = None
 
 
 class ConversationMetadata(BaseModel):
@@ -54,6 +56,15 @@ class Conversation(BaseModel):
 async def root():
     """Health check endpoint."""
     return {"status": "ok", "service": "LLM Council API"}
+
+
+@app.get("/api/config")
+async def get_config():
+    """Get available models and default chairman."""
+    return {
+        "council_models": COUNCIL_MODELS,
+        "default_chairman": DEFAULT_CHAIRMAN_MODEL
+    }
 
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])
@@ -79,6 +90,15 @@ async def get_conversation(conversation_id: str):
     return conversation
 
 
+@app.delete("/api/conversations/{conversation_id}")
+async def delete_conversation(conversation_id: str):
+    """Delete a conversation."""
+    deleted = storage.delete_conversation(conversation_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return {"status": "deleted", "id": conversation_id}
+
+
 @app.post("/api/conversations/{conversation_id}/message")
 async def send_message(conversation_id: str, request: SendMessageRequest):
     """
@@ -101,9 +121,10 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
         title = await generate_conversation_title(request.content)
         storage.update_conversation_title(conversation_id, title)
 
-    # Run the 3-stage council process
+    # Run the 3-stage council process with auto chairman
     stage1_results, stage2_results, stage3_result, metadata = await run_full_council(
-        request.content
+        request.content,
+        request.chairman_model  # None = auto (winner becomes chairman)
     )
 
     # Add assistant message with all stages
@@ -159,8 +180,13 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings}})}\n\n"
 
             # Stage 3: Synthesize final answer
-            yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
-            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results)
+            # Auto Chairman: use the top-ranked model unless manually overridden
+            chairman = request.chairman_model
+            if not chairman and aggregate_rankings:
+                chairman = aggregate_rankings[0]['model']  # Winner becomes chairman
+            
+            yield f"data: {json.dumps({'type': 'stage3_start', 'chairman': chairman})}\n\n"
+            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results, chairman)
             yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
 
             # Wait for title generation if it was started

@@ -9,11 +9,25 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [councilModels, setCouncilModels] = useState([]);
+  const [chairmanModel, setChairmanModel] = useState(null);
 
-  // Load conversations on mount
+  // Load conversations and config on mount
   useEffect(() => {
     loadConversations();
+    loadConfig();
   }, []);
+
+  const loadConfig = async () => {
+    try {
+      const config = await api.getConfig();
+      setCouncilModels(config.council_models);
+      // Start with Auto mode (null = winner becomes chairman)
+      setChairmanModel(null);
+    } catch (error) {
+      console.error('Failed to load config:', error);
+    }
+  };
 
   // Load conversation details when selected
   useEffect(() => {
@@ -57,6 +71,19 @@ function App() {
     setCurrentConversationId(id);
   };
 
+  const handleDeleteConversation = async (id) => {
+    try {
+      await api.deleteConversation(id);
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      if (currentConversationId === id) {
+        setCurrentConversationId(null);
+        setCurrentConversation(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+    }
+  };
+
   const handleSendMessage = async (content) => {
     if (!currentConversationId) return;
 
@@ -89,7 +116,7 @@ function App() {
         messages: [...prev.messages, assistantMessage],
       }));
 
-      // Send message with streaming
+      // Send message with streaming (pass chairman model)
       await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
         switch (eventType) {
           case 'stage1_start':
@@ -169,7 +196,7 @@ function App() {
           default:
             console.log('Unknown event type:', eventType);
         }
-      });
+      }, chairmanModel);
     } catch (error) {
       console.error('Failed to send message:', error);
       // Remove optimistic messages on error
@@ -188,11 +215,15 @@ function App() {
         currentConversationId={currentConversationId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onDeleteConversation={handleDeleteConversation}
       />
       <ChatInterface
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
+        councilModels={councilModels}
+        chairmanModel={chairmanModel}
+        onChairmanChange={setChairmanModel}
       />
     </div>
   );

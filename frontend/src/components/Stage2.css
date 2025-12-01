@@ -1,11 +1,17 @@
 .stage2 {
-  background: #fafafa;
+  background: var(--bg-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+}
+
+.stage2 .stage-title::before {
+  content: '2';
 }
 
 .stage2 h4 {
-  margin: 20px 0 8px 0;
-  color: #333;
-  font-size: 14px;
+  margin: 20px 0 10px 0;
+  color: var(--text-primary);
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -14,24 +20,26 @@
 }
 
 .stage-description {
-  margin: 0 0 12px 0;
-  color: #666;
+  margin: 0 0 14px 0;
+  color: var(--text-secondary);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .aggregate-rankings {
-  background: #f0f7ff;
-  padding: 16px;
-  border-radius: 8px;
+  background: white;
+  padding: 18px;
+  border-radius: var(--radius-md);
   margin-bottom: 20px;
-  border: 2px solid #d0e7ff;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-soft);
 }
 
 .aggregate-rankings h4 {
-  margin: 0 0 12px 0;
-  color: #2a7ae2;
-  font-size: 15px;
+  margin: 0 0 14px 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .aggregate-list {
@@ -43,32 +51,45 @@
 .aggregate-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
-  background: #ffffff;
-  border-radius: 6px;
-  border: 1px solid #d0e7ff;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.aggregate-item:hover {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .rank-position {
-  color: #2a7ae2;
+  color: var(--text-primary);
   font-weight: 700;
-  font-size: 16px;
-  min-width: 35px;
+  font-size: 13px;
+  min-width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
 }
 
 .rank-model {
   flex: 1;
-  color: #333;
-  font-family: monospace;
-  font-size: 14px;
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
   font-weight: 500;
 }
 
 .rank-score {
-  color: #666;
-  font-size: 13px;
-  font-family: monospace;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
 .stage2 .tabs {
@@ -79,75 +100,78 @@
 }
 
 .stage2 .tab {
-  padding: 8px 16px;
-  background: #ffffff;
-  border: 1px solid #d0d0d0;
-  border-radius: 6px 6px 0 0;
-  color: #666;
+  padding: 10px 18px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .stage2 .tab:hover {
-  background: #f0f0f0;
-  color: #333;
-  border-color: #4a90e2;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-soft);
 }
 
 .stage2 .tab.active {
-  background: #ffffff;
-  color: #4a90e2;
-  border-color: #4a90e2;
-  border-bottom-color: #ffffff;
-  font-weight: 600;
+  background: var(--text-primary);
+  color: white;
+  border-color: var(--text-primary);
 }
 
 .stage2 .tab-content {
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
   margin-bottom: 20px;
+  box-shadow: var(--shadow-soft);
 }
 
 .ranking-model {
-  color: #888;
-  font-size: 12px;
-  font-family: monospace;
-  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .ranking-content {
-  color: #333;
-  line-height: 1.6;
+  color: var(--text-primary);
+  line-height: 1.7;
   font-size: 14px;
 }
 
 .parsed-ranking {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 2px solid #e0e0e0;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
 }
 
 .parsed-ranking strong {
-  color: #2a7ae2;
-  font-size: 13px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .parsed-ranking ol {
-  margin: 8px 0 0 0;
+  margin: 10px 0 0 0;
   padding-left: 24px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .parsed-ranking li {
-  margin: 4px 0;
-  font-family: monospace;
+  margin: 6px 0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 13px;
 }
 
 .rank-count {
-  color: #999;
-  font-size: 12px;
+  color: var(--text-muted);
+  font-size: 11px;
 }
