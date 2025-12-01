@@ -1,24 +1,42 @@
-# LLM Council
+# AI Democracy
 
-![llmcouncil](header.jpg)
+![AI Democracy](header.jpg)
 
-The idea of this repo is that instead of asking a question to your favorite LLM provider (e.g. OpenAI GPT 5.1, Google Gemini 3.0 Pro, Anthropic Claude Sonnet 4.5, xAI Grok 4, eg.c), you can group them into your "LLM Council". This repo is a simple, local web app that essentially looks like ChatGPT except it uses OpenRouter to send your query to multiple LLMs, it then asks them to review and rank each other's work, and finally a Chairman LLM produces the final response.
+> 🙏 **Credits:** This project is a fork of [LLM Council](https://github.com/karpathy/llm-council) by [Andrej Karpathy](https://github.com/karpathy). Original concept and implementation by Karpathy.
 
-In a bit more detail, here is what happens when you submit a query:
+A democratic AI council where multiple LLMs vote on the best response. Instead of asking a single AI, you consult a council of 6 AI models who respond, vote on each other's answers, and the winner synthesizes the final response.
 
-1. **Stage 1: First opinions**. The user query is given to all LLMs individually, and the responses are collected. The individual responses are shown in a "tab view", so that the user can inspect them all one by one.
-2. **Stage 2: Review**. Each individual LLM is given the responses of the other LLMs. Under the hood, the LLM identities are anonymized so that the LLM can't play favorites when judging their outputs. The LLM is asked to rank them in accuracy and insight.
-3. **Stage 3: Final response**. The designated Chairman of the LLM Council takes all of the model's responses and compiles them into a single final answer that is presented to the user.
+## How It Works
 
-## Vibe Code Alert
+1. **Stage 1: Individual Responses** - All 6 AI models answer your question independently
+2. **Stage 2: Peer Voting** - Each model ranks the others' responses (anonymized to prevent bias)
+3. **Stage 3: Chairman Synthesis** - The winning model (or your chosen chairman) synthesizes the final answer
 
-This project was 99% vibe coded as a fun Saturday hack because I wanted to explore and evaluate a number of LLMs side by side in the process of [reading books together with LLMs](https://x.com/karpathy/status/1990577951671509438). It's nice and useful to see multiple responses side by side, and also the cross-opinions of all LLMs on each other's outputs. I'm not going to support it in any way, it's provided here as is for other people's inspiration and I don't intend to improve it. Code is ephemeral now and libraries are over, ask your LLM to change it in whatever way you like.
+## ✨ New Features (AI Democracy Edition)
+
+### 🎨 Redesigned UI
+- Glassmorphism design with soft shadows and blur effects
+- Clean, minimal aesthetic inspired by modern chat interfaces
+- Responsive layout with smooth animations
+
+### 👑 Auto Chairman
+- **Winner becomes chairman** - The top-ranked model from voting automatically synthesizes Stage 3
+- **Manual override** - Select any of the 6 models as chairman if you prefer
+- **Winner badge** - Shows 👑 crown and "Winner" label on the chairman
+
+### 📊 Compare All Responses
+- Side-by-side view of all AI responses in a grid layout
+- Quick access via "Compare" button after responses arrive
+- Press `Escape` to close modals
+
+### 🗂️ Conversation Management
+- Auto-generated titles from your first message
+- Delete conversations with hover delete button
+- Chat header showing current conversation title
 
 ## Setup
 
 ### 1. Install Dependencies
-
-The project uses [uv](https://docs.astral.sh/uv/) for project management.
 
 **Backend:**
 ```bash
@@ -29,7 +47,6 @@ uv sync
 ```bash
 cd frontend
 npm install
-cd ..
 ```
 
 ### 2. Configure API Key
@@ -40,7 +57,7 @@ Create a `.env` file in the project root:
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-Get your API key at [openrouter.ai](https://openrouter.ai/). Make sure to purchase the credits you need, or sign up for automatic top up.
+Get your API key at [openrouter.ai](https://openrouter.ai/).
 
 ### 3. Configure Models (Optional)
 
@@ -48,13 +65,13 @@ Edit `backend/config.py` to customize the council:
 
 ```python
 COUNCIL_MODELS = [
-    "openai/gpt-5.1",
-    "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
-    "x-ai/grok-4",
+    "openai/gpt-4o",
+    "google/gemini-2.0-flash-001",
+    "anthropic/claude-3.5-sonnet",
+    "x-ai/grok-3-mini-beta",
+    "deepseek/deepseek-chat",
+    "perplexity/sonar-pro",
 ]
-
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
 ```
 
 ## Running the Application
@@ -77,11 +94,15 @@ cd frontend
 npm run dev
 ```
 
-Then open http://localhost:5173 in your browser.
+Open http://localhost:5173 in your browser.
 
 ## Tech Stack
 
-- **Backend:** FastAPI (Python 3.10+), async httpx, OpenRouter API
-- **Frontend:** React + Vite, react-markdown for rendering
+- **Backend:** FastAPI, async httpx, OpenRouter API
+- **Frontend:** React + Vite, react-markdown
 - **Storage:** JSON files in `data/conversations/`
-- **Package Management:** uv for Python, npm for JavaScript
+- **Design:** Glassmorphism, CSS variables
+
+## License
+
+MIT - See original [LLM Council](https://github.com/karpathy/llm-council) for details.
